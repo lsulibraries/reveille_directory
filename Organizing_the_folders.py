@@ -10,6 +10,8 @@ target = 'C:\\Users\\libsys\\Desktop\\test'
 #path = input("Enter the collection path:")
 #target = input("Enter the target path:")
 collections = []
+old_file_paths = []
+new_file_paths = []
 working_dir = os.listdir(path)
 for folder in working_dir:
     issues_folder = os.path.join(path,folder)
@@ -30,6 +32,8 @@ for folder in working_dir:
             if file.endswith('.pdf'):
                 pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
                 shutil.copy(file_path,pdf_path)
+                old_file_paths.append(file_path)
+                new_file_paths.append(pdf_path)
             if file.endswith('.xml'):
                 if file.find("METS"):
                     xml_path = os.path.join(sub_folder_new,'MODS.xml')
@@ -46,6 +50,8 @@ for folder in working_dir:
                     os.mkdir(issue_number_folder) 
                 jp_path = os.path.join(issue_number_folder,'OBJ.jp2')
                 shutil.copy(file_path,jp_path)
+                old_file_paths.append(file_path)
+                new_file_paths.append(jp_path)
             if file.endswith('.txt'):
                 txt = re.search('\d+(?=\.\w+$)', file)
                 issue_number_folder = os.path.join(sub_folder_new,txt.group(0))
@@ -53,17 +59,36 @@ for folder in working_dir:
                     os.mkdir(issue_number_folder)
                 txt_path = os.path.join(issue_number_folder,'OCR.txt')
                 shutil.copy(file_path,txt_path)
+                old_file_paths.append(file_path)
+                new_file_paths.append(txt_path)
 #checksum
-with open(path,"rb") as f:
-    for chunk in iter(lambda: f.read(4096), b""):
-        hashlib.md5.update(chunk)
-os.chdir(target)
-for collection in collections:
-    zp = collection + '.zip'
-    zipf = ZipFile(zp , mode='w')
-    lenDirPath = len(new_path)
-    for root, _ , files in os.walk(new_path):
-        for file in files:
-            filePath = os.path.join(root, file)
-            zipf.write(filePath , filePath[lenDirPath :] )
-    zipf.close()
+md5_returned_old = []
+for file in old_file_paths:
+    with open(file,"rb") as file_to_check:
+        hash1 = hashlib.md5()
+        data = file_to_check.read()        
+        hash1.update(data.strip())
+        md5_return = hash1.hexdigest()
+        md5_returned_old.append(md5_return)
+md5_returned_new = []
+for file in new_file_paths:
+    with open(file,"rb") as file_to_check:
+        hash1 = hashlib.md5()
+        data = file_to_check.read()        
+        hash1.update(data.strip())
+        md5_return = hash1.hexdigest()
+        md5_returned_new.append(md5_return)
+if (md5_returned_new == md5_returned_old) == True:
+    print("Checksum verified. Continuing to compress the new folder")
+    os.chdir(target)
+    for collection in collections:
+        zp = collection + '.zip'
+        zipf = ZipFile(zp , mode='w')
+        lenDirPath = len(new_path)
+        for root, _ , files in os.walk(new_path):
+            for file in files:
+                filePath = os.path.join(root, file)
+                zipf.write(filePath , filePath[lenDirPath :] )
+        zipf.close()
+else:
+    print("Checksum not verified. Stopped compressing the new folder")
