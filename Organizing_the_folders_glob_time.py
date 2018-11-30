@@ -7,8 +7,9 @@ import shutil
 from zipfile import ZipFile
 import subprocess
 import hashlib
+import glob
 path = 'C:\\Users\\libsys\\Desktop\\success'
-target = 'C:\\Users\\libsys\\Desktop\\success'
+target = 'C:\\Users\\libsys\\Desktop\\organize'
 saxon_xsl_path = 'C:\\Users\\libsys\\.spyder-py3\\work\\mods_from_mets.xsl'
 #path = input("Enter the collection path:")
 #target = input("Enter the target path:")
@@ -31,35 +32,38 @@ for folder in working_dir:
         sub_folder_new = os.path.join(new_path,issue)
         if not os.path.exists(sub_folder_new):
             os.mkdir(sub_folder_new)
-        for file in files:
-            file_path = os.path.join(folder_path,file)
-            if file.endswith('.pdf'):
-                pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
-                shutil.copy(file_path,pdf_path)
-                old_file_paths.append(file_path)
-                new_file_paths.append(pdf_path)
-            if file.endswith('.xml'):
-                if file.find("METS"):
-                    xml_path = os.path.join(sub_folder_new,'MODS.xml')
-                    shutil.copy(file_path,xml_path)
-                    xml_new_path = xml_path #os.path.join(folder_path,file)
-                    saxon_source_option = "-s:%s" % xml_new_path
-                    saxon_output_option = "-o:%s" % xml_path
-                    subprocess.call(["saxon", saxon_output_option, saxon_source_option, saxon_xsl_path], shell=True)
-            if file.endswith('.jp2'):
-                jp = re.search('\d+(?=\.\w+$)', file)
-                issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
-                if not os.path.exists(issue_number_folder):
-                    os.mkdir(issue_number_folder) 
-                jp_path = os.path.join(issue_number_folder,'OBJ.jp2')
-                shutil.copy(file_path,jp_path)
-                old_file_paths.append(file_path)
-                new_file_paths.append(jp_path)
-            if file.endswith('.txt'):
-                txt = re.search('\d+(?=\.\w+$)', file)
-                issue_number_folder = os.path.join(sub_folder_new,txt.group(0))
-                if not os.path.exists(issue_number_folder):
-                    os.mkdir(issue_number_folder)
+        pdfs = glob.glob('%s/*.pdf' % folder_path)
+        for pdf in pdfs:
+            file_path = os.path.join(folder_path,pdf)
+            pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
+            shutil.copy(file_path,pdf_path)
+            old_file_paths.append(file_path)
+            new_file_paths.append(pdf_path)
+        xmls = glob.glob('%s/*METS.xml' % folder_path)
+        for xml in xmls:
+            file_path = os.path.join(folder_path,xml)
+            xml_path = os.path.join(sub_folder_new,'MODS.xml')
+            shutil.copy(file_path,xml_path)
+            xml_new_path = xml_path
+            saxon_source_option = "-s:%s" % xml_new_path
+            saxon_output_option = "-o:%s" % xml_path
+            subprocess.call(["saxon", saxon_output_option, saxon_source_option, saxon_xsl_path], shell=True)
+        jp2s = glob.glob('%s/*.jp2' % folder_path)
+        for jp2 in jp2s:
+          jp = re.search('\d+(?=\.\w+$)', jp2)
+          issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
+          if not os.path.exists(issue_number_folder):
+            os.mkdir(issue_number_folder) 
+            jp_path = os.path.join(issue_number_folder,'OBJ.jp2')
+            shutil.copy(file_path,jp_path)
+            old_file_paths.append(file_path)
+            new_file_paths.append(jp_path)
+        ocrs = glob.glob('%s/*.txt' % folder_path)
+        for ocr in ocrs:
+            txt = re.search('\d+(?=\.\w+$)', ocr)
+            issue_number_folder = os.path.join(sub_folder_new,txt.group(0))
+            if not os.path.exists(issue_number_folder):
+                os.mkdir(issue_number_folder)
                 txt_path = os.path.join(issue_number_folder,'OCR.txt')
                 shutil.copy(file_path,txt_path)
                 old_file_paths.append(file_path)
