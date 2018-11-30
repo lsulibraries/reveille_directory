@@ -6,10 +6,11 @@ import shutil
 from zipfile import ZipFile
 import subprocess
 import hashlib
-target = '/home/wconli1/Desktop/Reveille_playground/'
-path = '/home/wconli1/Desktop/Reveille_test-two/'
-#path = input("Enter the collection path:")
-#target = input("Enter the target path:")
+xsl = input("Enter the xsl file's full path:")
+path = input("Enter the collection path:")
+target = input("Enter the target path:")
+old_file_paths = []
+new_file_paths = []
 collections = []
 working_dir = os.listdir(path)
 for folder in working_dir:
@@ -34,12 +35,13 @@ for folder in working_dir:
             if file.endswith('.xml'):
                 if file.find("METS") != -1:
                     print(file)
+                    print('has been converted from mets to mods')
                     xml_path = os.path.join(sub_folder_new,'MODS.xml')
                     shutil.copy(file_path,xml_path)
-                    xml_new_path = xml_path #os.path.join(folder_path,file)
+                    xml_new_path = xml_path
                     saxon_args = "-s:%s" % xml_new_path
                     saxon_args += " -o:%s" % xml_path
-                    saxon_args += ' /home/wconli1/Clones/reveille_directory/mods_from_mets.xsl'
+                    saxon_args += " %s" % xsl
                     saxon_call = "java -jar /usr/share/java/saxon9he.jar %s" % saxon_args
                     subprocess.call([saxon_call ], shell=True)
             if file.endswith('.jp2'):
@@ -57,16 +59,34 @@ for folder in working_dir:
                 txt_path = os.path.join(issue_number_folder,'OCR.txt')
                 shutil.copy(file_path,txt_path)
 #checksum
-#with open(path,"r+") as f:
-#    for chunk in iter(lambda: f.read(4096), b""):
-#        hashlib.md5.update(chunk)
-os.chdir(target)
-for collection in collections:
-    zp = collection + '.zip'
-    zipf = ZipFile(zp , mode='w')
-    lenDirPath = len(new_path)
-    for root, _ , files in os.walk(new_path):
-        for file in files:
-            filePath = os.path.join(root, file)
-            zipf.write(filePath , filePath[lenDirPath :] )
-    zipf.close()
+md5_returned_old = []
+for file in old_file_paths:
+    with open(file,"rb") as file_to_check:
+        hash1 = hashlib.md5()
+        data = file_to_check.read()        
+        hash1.update(data.strip())
+        md5_return = hash1.hexdigest()
+        md5_returned_old.append(md5_return)
+md5_returned_new = []
+for file in new_file_paths:
+    with open(file,"rb") as file_to_check:
+        hash1 = hashlib.md5()
+        data = file_to_check.read()        
+        hash1.update(data.strip())
+        md5_return = hash1.hexdigest()
+        md5_returned_new.append(md5_return)
+if (md5_returned_new == md5_returned_old) == True:
+    print("Checksum verified. Continuing to compress the new folder")
+    os.chdir(target)
+    for collection in collections:
+        zp = collection + '.zip'
+        zipf = ZipFile(zp , mode='w')
+        lenDirPath = len(new_path)
+        for root, _ , files in os.walk(new_path):
+            for file in files:
+                filePath = os.path.join(root, file)
+                zipf.write(filePath , filePath[lenDirPath :] )
+        zipf.close()
+else:
+    print("Checksum not verified. Stopped compressing the new folder")
+
