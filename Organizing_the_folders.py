@@ -8,8 +8,6 @@ import subprocess
 import hashlib
 target = '/home/wconli1/Desktop/Reveille_playground/'
 path = '/home/wconli1/Desktop/Reveille_test-two/'
-print(path)
-print(target)
 #path = input("Enter the collection path:")
 #target = input("Enter the target path:")
 collections = []
@@ -34,15 +32,16 @@ for folder in working_dir:
                 pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
                 shutil.copy(file_path,pdf_path)
             if file.endswith('.xml'):
-                if file.find("METS"):
+                if file.find("METS") != -1:
+                    print(file)
                     xml_path = os.path.join(sub_folder_new,'MODS.xml')
                     shutil.copy(file_path,xml_path)
                     xml_new_path = xml_path #os.path.join(folder_path,file)
-                    saxon_source_option = "-s:%s" % xml_new_path
-                    saxon_output_option = "-o:%s" % xml_path
-                    saxon_xsl = '/home/wconli1/Clones/reveille_directory/mods_from_mets.xsl'
-                    print(saxon_output_option, saxon_source_option, saxon_xsl)
-                    subprocess.call(["saxon", saxon_output_option, saxon_source_option, saxon_xsl], shell=True)
+                    saxon_args = "-s:%s" % xml_new_path
+                    saxon_args += " -o:%s" % xml_path
+                    saxon_args += ' /home/wconli1/Clones/reveille_directory/mods_from_mets.xsl'
+                    saxon_call = "java -jar /usr/share/java/saxon9he.jar %s" % saxon_args
+                    subprocess.call([saxon_call ], shell=True)
             if file.endswith('.jp2'):
                 jp = re.search('\d+(?=\.\w+$)', file)
                 issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
