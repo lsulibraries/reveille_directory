@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import os
 import re
@@ -5,8 +6,10 @@ import shutil
 from zipfile import ZipFile
 import subprocess
 import hashlib
-path = 'C:\\Users\\libsys\\Desktop\\success'
-target = 'C:\\Users\\libsys\\Desktop\\test'
+target = '/home/wconli1/Desktop/Reveille_playground/'
+path = '/home/wconli1/Desktop/Reveille_test-two/'
+print(path)
+print(target)
 #path = input("Enter the collection path:")
 #target = input("Enter the target path:")
 collections = []
@@ -37,7 +40,8 @@ for folder in working_dir:
                     xml_new_path = xml_path #os.path.join(folder_path,file)
                     saxon_source_option = "-s:%s" % xml_new_path
                     saxon_output_option = "-o:%s" % xml_path
-                    saxon_xsl = 'C:\\Users\\libsys\\.spyder-py3\\work\\mods_from_mets.xsl'
+                    saxon_xsl = '/home/wconli1/Clones/reveille_directory/mods_from_mets.xsl'
+                    print(saxon_output_option, saxon_source_option, saxon_xsl)
                     subprocess.call(["saxon", saxon_output_option, saxon_source_option, saxon_xsl], shell=True)
             if file.endswith('.jp2'):
                 jp = re.search('\d+(?=\.\w+$)', file)
@@ -54,9 +58,9 @@ for folder in working_dir:
                 txt_path = os.path.join(issue_number_folder,'OCR.txt')
                 shutil.copy(file_path,txt_path)
 #checksum
-with open(path,"rb") as f:
-    for chunk in iter(lambda: f.read(4096), b""):
-        hashlib.md5.update(chunk)
+#with open(path,"r+") as f:
+#    for chunk in iter(lambda: f.read(4096), b""):
+#        hashlib.md5.update(chunk)
 os.chdir(target)
 for collection in collections:
     zp = collection + '.zip'
