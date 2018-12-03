@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+#import time
+#time_start = time.time()
 import glob
 import os
 import re
@@ -7,6 +9,9 @@ import shutil
 from zipfile import ZipFile
 import subprocess
 import hashlib
+#xsl = '/home/wconli1/Clones/reveille_directory/mods_from_mets.xsl'
+#path = '/home/wconli1/Desktop/Rev'
+#target = '/home/wconli1/Desktop/Reveille_playground'
 xsl = input("Enter the xsl file's full path:")
 path = input("Enter the collection path:")
 target = input("Enter the target path:")
@@ -44,7 +49,6 @@ for folder in working_dir:
         jp2s = glob.glob('%s/*.jp2' % folder_path)
         for jp2 in jp2s:
             file_path = os.path.join(folder_path, jp2)
-            subprocess.call('jpylyzer %s' % jp2, shell=True)
             jp = re.search('\d+(?=\.\w+$)', jp2)
             issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
             if not os.path.exists(issue_number_folder):
@@ -92,3 +96,4 @@ if (md5_returned_new == md5_returned_old) == True:
 else:
     print("Checksum not verified. Stopped compressing the new folder")
 
+#print(time.time() - time_start)

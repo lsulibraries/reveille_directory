@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import time
 start_time =time.time()
-#from jpylyzer import jpylyzer
 import glob
 import os
 import re
@@ -10,11 +9,8 @@ import shutil
 from zipfile import ZipFile
 import subprocess
 import hashlib
-#xsl = input("Enter the xsl file's full path:")
-#path = input("Enter the collection path:")
-#target = input("Enter the target path:")
 xsl = "/home/wconli1/Clones/reveille_directory/mods_from_mets.xsl"
-path = "/home/wconli1/Desktop/Reveille_test-two/"
+path = "/home/wconli1/Desktop/Reveille_test-four/"
 target = "/home/wconli1/Desktop/Reveille_playground/"
 old_file_paths = []
 new_file_paths = []
@@ -34,18 +30,9 @@ for folder in working_dir:
         sub_folder_new = os.path.join(new_path,issue)
         if not os.path.exists(sub_folder_new):
             os.mkdir(sub_folder_new)
-#        for file in files:
-#        pdfs = glob.glob('%s/*.pdf' % folder_path)
-#        for pdf in pdfs:
-#            file_path = os.path.join(folder_path,pdf)
-#            #if file.endswith('.pdf'):
-#            pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
-#            shutil.copy(file_path,pdf_path)
         xmls = glob.glob('%s/*METS.xml' % folder_path)
         for xml in xmls:
             file_path = os.path.join(folder_path,xml)
-#            if file.endswith('.xml'):
-#               if file.find("METS") != -1:
             print(xml)
             print('has been converted from mets to mods')
             xml_path = os.path.join(sub_folder_new,'MODS.xml')
@@ -56,11 +43,9 @@ for folder in working_dir:
             saxon_args += " %s" % xsl
             saxon_call = "java -jar /usr/share/java/saxon9he.jar %s" % saxon_args
             subprocess.call([saxon_call ], shell=True)
-#            if file.endswith('.jp2'):
         jp2s = glob.glob('%s/*.jp2' % folder_path)
         for jp2 in jp2s:
             file_path = os.path.join(folder_path, jp2)
-            subprocess.call('jpylyzer %s' % jp2, shell=True)
             jp = re.search('\d+(?=\.\w+$)', jp2)
             issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
             if not os.path.exists(issue_number_folder):
@@ -68,7 +53,6 @@ for folder in working_dir:
                 jp_path = os.path.join(issue_number_folder,'OBJ.jp2')
                 shutil.copy(file_path,jp_path)
         ocrs = glob.glob('%s/*.txt' % folder_path) 
-        #if file.endswith('.txt'):
         for ocr in ocrs:
             file_path = os.path.join(folder_path, ocr)
             txt = re.search('\d+(?=\.\w+$)', ocr)
@@ -110,4 +94,3 @@ else:
     print("Checksum not verified. Stopped compressing the new folder")
 end_time =time.time()
 print("took:", time.time() -start_time)
-
