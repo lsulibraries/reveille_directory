@@ -9,7 +9,7 @@ from zipfile import ZipFile
 import subprocess
 import hashlib
 xsl = "/home/wconli1/Clones/reveille_directory/mods_from_mets.xsl"
-path = "/home/wconli1/Desktop/Reveille_test-two/"
+path = "/home/wconli1/Desktop/Reveille_test-four/"
 target = "/home/wconli1/Desktop/Reveille_playground/"
 old_file_paths = []
 new_file_paths = []

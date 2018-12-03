@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import glob
 import os
 import re
 import shutil
@@ -27,35 +28,36 @@ for folder in working_dir:
         sub_folder_new = os.path.join(new_path,issue)
         if not os.path.exists(sub_folder_new):
             os.mkdir(sub_folder_new)
-        for file in files:
-            file_path = os.path.join(folder_path,file)
-            if file.endswith('.pdf'):
-                pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
-                shutil.copy(file_path,pdf_path)
-            if file.endswith('.xml'):
-                if file.find("METS") != -1:
-                    print(file)
-                    print('has been converted from mets to mods')
-                    xml_path = os.path.join(sub_folder_new,'MODS.xml')
-                    shutil.copy(file_path,xml_path)
-                    xml_new_path = xml_path
-                    saxon_args = "-s:%s" % xml_new_path
-                    saxon_args += " -o:%s" % xml_path
-                    saxon_args += " %s" % xsl
-                    saxon_call = "java -jar /usr/share/java/saxon9he.jar %s" % saxon_args
-                    subprocess.call([saxon_call ], shell=True)
-            if file.endswith('.jp2'):
-                jp = re.search('\d+(?=\.\w+$)', file)
-                issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
-                if not os.path.exists(issue_number_folder):
-                    os.mkdir(issue_number_folder) 
+        xmls = glob.glob('%s/*METS.xml' % folder_path)
+        for xml in xmls:
+            file_path = os.path.join(folder_path,xml)
+            print(xml)
+            print('has been converted from mets to mods')
+            xml_path = os.path.join(sub_folder_new,'MODS.xml')
+            shutil.copy(file_path,xml_path)
+            xml_new_path = xml_path
+            saxon_args = "-s:%s" % xml_new_path
+            saxon_args += " -o:%s" % xml_path
+            saxon_args += " %s" % xsl
+            saxon_call = "java -jar /usr/share/java/saxon9he.jar %s" % saxon_args
+            subprocess.call([saxon_call ], shell=True)
+        jp2s = glob.glob('%s/*.jp2' % folder_path)
+        for jp2 in jp2s:
+            file_path = os.path.join(folder_path, jp2)
+            subprocess.call('jpylyzer %s' % jp2, shell=True)
+            jp = re.search('\d+(?=\.\w+$)', jp2)
+            issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
+            if not os.path.exists(issue_number_folder):
+                os.mkdir(issue_number_folder) 
                 jp_path = os.path.join(issue_number_folder,'OBJ.jp2')
                 shutil.copy(file_path,jp_path)
-            if file.endswith('.txt'):
-                txt = re.search('\d+(?=\.\w+$)', file)
-                issue_number_folder = os.path.join(sub_folder_new,txt.group(0))
-                if not os.path.exists(issue_number_folder):
-                    os.mkdir(issue_number_folder)
+        ocrs = glob.glob('%s/*.txt' % folder_path) 
+        for ocr in ocrs:
+            file_path = os.path.join(folder_path, ocr)
+            txt = re.search('\d+(?=\.\w+$)', ocr)
+            issue_number_folder = os.path.join(sub_folder_new,txt.group(0))
+            if not os.path.exists(issue_number_folder):
+                os.mkdir(issue_number_folder)
                 txt_path = os.path.join(issue_number_folder,'OCR.txt')
                 shutil.copy(file_path,txt_path)
 #checksum

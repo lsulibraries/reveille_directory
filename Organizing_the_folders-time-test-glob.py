@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 start_time =time.time()
+#from jpylyzer import jpylyzer
 import glob
 import os
 import re
@@ -34,12 +35,12 @@ for folder in working_dir:
         if not os.path.exists(sub_folder_new):
             os.mkdir(sub_folder_new)
 #        for file in files:
-        pdfs = glob.glob('%s/*.pdf' % folder_path)
-        for pdf in pdfs:
-            file_path = os.path.join(folder_path,pdf)
-            #if file.endswith('.pdf'):
-            pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
-            shutil.copy(file_path,pdf_path)
+#        pdfs = glob.glob('%s/*.pdf' % folder_path)
+#        for pdf in pdfs:
+#            file_path = os.path.join(folder_path,pdf)
+#            #if file.endswith('.pdf'):
+#            pdf_path = os.path.join(sub_folder_new,'PDF.pdf')
+#            shutil.copy(file_path,pdf_path)
         xmls = glob.glob('%s/*METS.xml' % folder_path)
         for xml in xmls:
             file_path = os.path.join(folder_path,xml)
@@ -58,6 +59,8 @@ for folder in working_dir:
 #            if file.endswith('.jp2'):
         jp2s = glob.glob('%s/*.jp2' % folder_path)
         for jp2 in jp2s:
+            file_path = os.path.join(folder_path, jp2)
+            subprocess.call('jpylyzer %s' % jp2, shell=True)
             jp = re.search('\d+(?=\.\w+$)', jp2)
             issue_number_folder = os.path.join(sub_folder_new,jp.group(0))
             if not os.path.exists(issue_number_folder):
@@ -67,6 +70,7 @@ for folder in working_dir:
         ocrs = glob.glob('%s/*.txt' % folder_path) 
         #if file.endswith('.txt'):
         for ocr in ocrs:
+            file_path = os.path.join(folder_path, ocr)
             txt = re.search('\d+(?=\.\w+$)', ocr)
             issue_number_folder = os.path.join(sub_folder_new,txt.group(0))
             if not os.path.exists(issue_number_folder):
