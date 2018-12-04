@@ -97,5 +97,4 @@ if (md5_returned_new == md5_returned_old) == True:
         zipf.close()
 else:
     print("Checksum not verified. Stopped compressing the new folder")
-
-#print(time.time() - time_start)
+print(time.time() - time_start)
