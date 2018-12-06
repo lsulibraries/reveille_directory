@@ -153,7 +153,7 @@
                 <physicalLocation displayLabel="Physical Location" xlink:href="http://lib.lsu.edu">LSU Libraries</physicalLocation>
                 <physicalLocation authority="oclcorg" displayLabel="OCLC Member Symbol">LUU</physicalLocation>
             </location>
-            <accessCondition type="use and reproduction" displayLabel="Rights">Physical rights are retained by the LSU Libraries. Copyright of the original material is retained in accordance with U.S. copyright laws.</accessCondition>
+            <accessCondition xlink:href="http://rightsstatements.org/vocab/InC-NC/1.0/" type="use and reproduction" displayLabel="Rights Statement">In Copyright - Non-Commercial Use Permitted</accessCondition>\
             <accessCondition type="use and reproduction" displayLabel="Contact Information">Please submit an LSU Special Collections reference ticket at https://askus.lib.lsu.edu/special for any questions or comments about this digital object.</accessCondition>
             <recordInfo>
                 <languageOfCataloging>
